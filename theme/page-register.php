@@ -1,11 +1,19 @@
 
+
 <!-- Database connection -->
 <?php 
 	include_once 'database/connection.php';
+	
+	use PHPMailer\PHPMailer\PHPMailer;
+	use PHPMailer\PHPMailer\Exception;
 
+	require 'PHPMailer/src/Exception.php';
+	require 'PHPMailer/src/PHPMailer.php';
+	require 'PHPMailer/src/SMTP.php';
 	$error = '';
 	$length = '';
 	$pwd = '';
+	$email_check = '';
 
 	if(isset($_POST['submit'])){
 		$name = mysqli_escape_string($conn, $_POST['name']);
@@ -14,6 +22,11 @@
 		$password2 = mysqli_escape_string($conn, $_POST['password2']);
 		$mobile = mysqli_escape_string($conn, $_POST['mobile']);
 		$university = mysqli_escape_string($conn, $_POST['university']);
+		$email_exist = "SELECT email FROM `user` WHERE email ='$email'";
+		$query = mysqli_query($conn, $email_exist);
+		if(mysqli_num_rows($query)>0){
+			$email_check = "you email exsited";
+		}
 
 		if(empty($name) || empty($email) || empty($password) || empty($password2) || empty($mobile) || empty($university)){
 			$error = "This field is required";
@@ -23,6 +36,16 @@
 		}
 		elseif($password!=$password2){
 			$pwd = "Password dose not match";
+		}
+		else{
+			$password = md5($password);
+			$vkey = md5(time().$email);
+			//echo "<script>alert('$vkey')</script>";
+			$sql = "INSERT INTO `user`(`name`, `email`, `password`, `mobile`, `university`, `v_key`, `v_status`) VALUES ('$name','$email','$password','$mobile','$university','$vkey',0)";
+			$query = mysqli_query($conn,$sql);
+			if($query){
+				
+			}
 		}
 
 	}
@@ -66,7 +89,7 @@
 						<div class="input-group">
 							<span class="input-group-addon"><i class="icon ion-email"></i></span>
 							<input type="email" name="email" class="form-control" id="email" placeholder="Email">
-							<span class="text-danger text-end"><?=$error;?></span>
+							<span class="text-danger text-end"><?=$error;?> <?=$email_check?></span>
 						</div>
 					</div>
 				</div>
