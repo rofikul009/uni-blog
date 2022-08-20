@@ -44,12 +44,36 @@
 			$sql = "INSERT INTO `user`(`name`, `email`, `password`, `mobile`, `university`, `v_key`, `v_status`) VALUES ('$name','$email','$password','$mobile','$university','$vkey',0)";
 			$query = mysqli_query($conn,$sql);
 			if($query){
+				$mail = new PHPMailer();
+				$mail ->isSMTP();
+				$mail->Host = "smtp.gmail.com";
+				$mail->SMTPAuth = true;
+				$mail->Username = "rofikulislam009@gmail.com";
+				$mail->password = "01941091687r";
+				$mail->SMTPSecure = "tls";
+				$mail->Port = 465;
+				$mail->From ="rofikulislam009@gmail.com";
+				$mail->FromName = "Rofikul";
+				$mail->addAddress($email, "Rofikul");
+				$mail->isHTML(true);
+				$mail->Subject = "webdev blog";
+				$mail->Body = "<a href='http://localhost/blog/theme/page-register.php?vkey=$vkey'>Clik Hear</a>";
 				
+				if(!$mail->send()){
+					echo "Mailer Error".$mail->ErrorInfo;
+				}
+				else{
+					echo "<script>alert('Verification Has been Sent')</script>";
+				}
+				header("location:success.php");
+			}
+			else{
+				echo mysqli_errno($conn);
 			}
 		}
 
 	}
-
+	
 
 
 ?>
